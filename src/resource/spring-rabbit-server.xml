@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:p="http://www.springframework.org/schema/p" 
+xmlns:context="http://www.springframework.org/schema/context" 
+xmlns:mvc="http://www.springframework.org/schema/mvc" 
+xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+xsi:schemaLocation="  
+    http://www.springframework.org/schema/beans   
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+    http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+    http://www.springframework.org/schema/mvc  
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd  
+    http://www.springframework.org/schema/rabbit
+    http://www.springframework.org/schema/rabbit/spring-rabbit-1.3.xsd" default-autowire="byName">
+    <!-- rabbitmq发送和接受消息模板 -->
+	<!-- <bean id="rabbitTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate"> 
+		<constructor-arg ref="connectionFactory"></constructor-arg> <property name="connectionFactory" 
+		ref="connectionFactory"></property> </bean> -->
+  
+    <!-- 连接rabbitmq服务器的工厂类 -->
+  	<!--   <bean id="connectionFactory" class="org.springframework.amqp.rabbit.connection.CachingConnectionFactory">
+    	<property name="host" value="localhost"></property>
+    	<property name="port" value="5672"></property>
+    	<property name="username" value="guest"></property>
+    	<property name="password" value="guest"></property>
+    	<property name="virtualHost" value="/"></property>
+    </bean> -->
+    <!-- 创建rabbitAdmin 代理类 -->
+   <!--  <bean id="rabbitAdmin" class="org.springframework.amqp.rabbit.core.RabbitAdmin">
+    	<constructor-arg ref="connectionFactory"></constructor-arg>
+    </bean> -->
+    <rabbit:connection-factory id="connectionFactory" host="localhost" port="5672" 
+    	username="guest" password="guest" virtual-host="/"/>
+    <rabbit:admin connection-factory="connectionFactory"/>
+    <rabbit:template id="rabbitTemplate" connection-factory="connectionFactory" exchange="topicExchange" queue="msgqueue" routing-key="msg.q.e"/>
+    
+    <!-- 定义queue，Exchange中绑定queue和routekey -->
+    <rabbit:queue name="msgqueue"/>
+    <rabbit:topic-exchange name="topicExchange" auto-declare="true" auto-delete="true">
+    	<rabbit:bindings>
+    		<rabbit:binding pattern="msg.*.*" queue="msgqueue"></rabbit:binding>
+    	</rabbit:bindings>
+    </rabbit:topic-exchange>
+</beans> 
